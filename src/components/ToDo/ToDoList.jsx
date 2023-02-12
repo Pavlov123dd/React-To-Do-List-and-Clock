@@ -1,28 +1,28 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useContext} from 'react';
 import {useLocalStorage} from "../../hooks/common";
 import './style.sass';
 import {getList, deleteItem, updateItem, addItem} from '../../services/todoService';
 import ToDoItem from "./ToDoItem/ToDoItem";
 import Form from "./ToDoForm/Form";
 import ToDoFilter from "./ToDoFilter/ToDoFilter";
-import ToDoTheme from "./ToDoTheme/ToDoTheme";
+import ThemeContext from "../../context/ThemeContext";
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
 
-
-export default function ToDoList(props) {
+export default function ToDoList( ) {
     const [list, setList] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
     const [title, setTittle] = useState('');
     const [selectedFilter, setSelectedFilter] = useLocalStorage('selectedFilter', 'all');
-    const [mode, setMode] = useLocalStorage('mode', 'light');
+    const {theme} = useContext(ThemeContext)
+    const [isLoad, setLoad]=useState(true)
 
+    useEffect(()=>{(async ()=>{
 
-    useEffect(() => {
+        setList( await getList())
 
-        getList()
-            .then((data) => {
-                setList(data)
-            })
-    }, []);
+    })()},[])
 
     useEffect(() => {
         setFilteredList(list);
@@ -81,27 +81,31 @@ export default function ToDoList(props) {
 
 
     return (
-        <div className={mode}>
-            <h1>To Do List</h1>
-            <ToDoTheme mode={mode} setMode={setMode}/>
-            <Form submitForm={submitForm}
-                  setTittle={setTittle}/>
-            <ToDoFilter filterItems={filterItems}
-                        selectedFilter={selectedFilter}/>
+         <Container maxWidth="sm" className={theme}>
+        <Typography variant="h4" gutterBottom>
+            To Do List
+        </Typography>
 
-            {list.length > 0 ?
-                (
-                    <ul className='list'>
-                        {filteredList.map(item => (
-                            <ToDoItem item={item}
-                                      key={item.id}
 
-                                      changeCompleted={changeCompleted}
-                                      removeItem={removeItem}/>
-                        ))}
-                    </ul>
-                ) : null}
-        </div>
+        <Form submitForm={submitForm}
+              setTittle={setTittle}/>
+        <ToDoFilter filterItems={filterItems}
+                    selectedFilter={selectedFilter}/>
+
+        {list.length > 0 ?
+            (
+                <List className='list' >
+                    {filteredList.map(item => (
+                        <ToDoItem item={item}
+                                  key={item.id}
+
+                                  changeCompleted={changeCompleted}
+                                  removeItem={removeItem}/>
+                    ))}
+                </List>
+            ) : null}
+
+    </Container>
 
     );
 };

@@ -1,10 +1,5 @@
-form {
-  margin-bottom: 10px;
-  font-size: 18px;
-}
-form label {
-  margin-right: 15px;
-  font-weight: bold;
+.input-title {
+  top: -12px;
 }
 
 /*# sourceMappingURL=style.css.map */
